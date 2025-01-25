@@ -11,9 +11,14 @@ export default function CSRComponent() {
 
   const ITEMS_PER_PAGE = 3;
 
-  const loadCsrMore = async () => {
+  const loadCsrMore = async (isInitialLoad = false) => {
     setCsrLoading(true);
     try {
+      // 초기 로드 시 3초 지연 추가
+      if (isInitialLoad) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+
       const res = await fetch(`/api/delayedTrending?page=${csrPage}&limit=${ITEMS_PER_PAGE}`);
       const data = await res.json();
 
@@ -28,7 +33,7 @@ export default function CSRComponent() {
   };
 
   useEffect(() => {
-    loadCsrMore();
+    loadCsrMore(true); // 초기 로드 시 3초 지연 포함
   }, []);
 
   const openModal = (show) => {

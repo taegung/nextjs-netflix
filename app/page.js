@@ -1,14 +1,17 @@
 import Banner from "./components/Banner";
 import Top10List from "./components/Top10List";
 
+export default async function Home() {
+  const bannerData = await fetch("http://localhost:3000/api/banner").then((res) =>
+    res.json()
+  );
 
-export default function Home() {
   return (
     <div>
-      {/* 배너 (SSR) */}
-      <Banner />
+      {/* SSR Banner */}
+      <Banner bannerData={bannerData} />
       <div className="px-8">
-        {/* TOP 10 리스트 (CSR) */}
+        {/* CSR Top10List */}
         <Top10List />
       </div>
     </div>
