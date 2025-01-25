@@ -16,8 +16,11 @@ npm 모듈 설치
 ##  netfix 메인화면 CSR SSR 적용
 
 
-영화 리스트 보여주기 CSR SSR 적용
-CSR이 더 효율적이다
-![image](https://github.com/user-attachments/assets/92005536-1b86-4502-9186-27d272e6be19)
+### 영화 리스트 보여주기 CSR SSR 적용
+#### CSR이 더 효율적이다
+
+#### 배너는 SSR적용
+![image](https://github.com/user-attachments/assets/d1a08b72-7b84-490c-8049-111b463a9d73)
+
 
 
