@@ -2,19 +2,41 @@
 
 import { useState, useEffect } from "react";
 
+const shimmer =
+  "before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/60 before:to-transparent";
+
+// 개별 카드 스켈레톤
+function CardSkeleton() {
+  return (
+    <div className={`${shimmer} relative overflow-hidden rounded-xl bg-gray-100 p-2 shadow-sm`}>
+      <div className="flex p-4">
+        <div className="h-5 w-5 rounded-md bg-gray-200" />
+        <div className="ml-2 h-6 w-16 rounded-md bg-gray-200 text-sm font-medium" />
+      </div>
+      <div className="flex items-center justify-center truncate rounded-xl bg-white px-4 py-8">
+        <div className="h-7 w-20 rounded-md bg-gray-200" />
+      </div>
+    </div>
+  );
+}
+
 export default function CSRComponent() {
-  const [csrShows, setCsrShows] = useState([]);
+  const [csrShows, setCsrShows] = useState([]); // 기존 데이터
+  const [newItems, setNewItems] = useState([]); // 새롭게 추가될 데이터
   const [csrPage, setCsrPage] = useState(1);
   const [csrLoading, setCsrLoading] = useState(false);
-  const [selectedShow, setSelectedShow] = useState(null); // 선택된 쇼
-  const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태
+  const [selectedShow, setSelectedShow] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const ITEMS_PER_PAGE = 3;
 
   const loadCsrMore = async (isInitialLoad = false) => {
     setCsrLoading(true);
+
+    // 스켈레톤을 표시하기 위해 빈 배열 추가
+    setNewItems(Array(ITEMS_PER_PAGE).fill(null));
+
     try {
-      // 초기 로드 시 3초 지연 추가
       if (isInitialLoad) {
         await new Promise((resolve) => setTimeout(resolve, 1000));
       }
@@ -23,17 +45,22 @@ export default function CSRComponent() {
       const data = await res.json();
 
       const newData = data.filter((newItem) => !csrShows.some((item) => item.id === newItem.id));
-      setCsrShows((prev) => [...prev, ...newData]);
-      setCsrPage((prev) => prev + 1);
+
+      setTimeout(() => {
+        setCsrShows((prev) => [...prev, ...newData]); // 기존 데이터 유지 + 새로운 데이터 추가
+        setNewItems([]); // 새로운 데이터가 추가되었으므로 스켈레톤 제거
+        setCsrPage((prev) => prev + 1);
+      }, 500); // 스켈레톤 유지 시간 (1초)
     } catch (error) {
       console.error("CSR 데이터 로드 실패:", error);
+      setNewItems([]);
     } finally {
       setCsrLoading(false);
     }
   };
 
   useEffect(() => {
-    loadCsrMore(true); // 초기 로드 시 3초 지연 포함
+    loadCsrMore(true);
   }, []);
 
   const openModal = (show) => {
@@ -51,6 +78,8 @@ export default function CSRComponent() {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4 text-blue-500">CSR 방식</h2>
+
+      {/* 기존 데이터는 유지 + 새로 추가될 데이터에는 스켈레톤 표시 */}
       <div className="grid grid-cols-3 gap-4">
         {csrShows.map((show) => (
           <div
@@ -70,8 +99,13 @@ export default function CSRComponent() {
             <span className="text-red-500">{show.badge}</span>
           </div>
         ))}
+
+        {/* 새롭게 추가되는 데이터에만 스켈레톤 표시 */}
+        {newItems.map((_, index) => (
+          <CardSkeleton key={`skeleton-${index}`} />
+        ))}
       </div>
-      {csrLoading && <p className="text-center text-gray-500">로딩 중...</p>}
+
       {!csrLoading && csrShows.length < 25 && (
         <div className="text-center mt-4">
           <button
