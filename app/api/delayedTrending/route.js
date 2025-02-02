@@ -36,6 +36,6 @@ export async function GET(request) {
   const endIndex = page * limit; // 요청된 페이지까지의 데이터
   const paginatedShows = allShows.slice(startIndex, endIndex);
 
-  await new Promise((resolve) => setTimeout(resolve, 2000)); // 2초 지연
+  await new Promise((resolve) => setTimeout(resolve, 500)); // 2초 지연
   return NextResponse.json(paginatedShows);
 }
